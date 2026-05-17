@@ -212,3 +212,65 @@ class ArticlePublic(ArticleBase):
     sentences: list[ArticleSentence] = Field(default_factory=list)
     key_points: list[ArticleKeyPoint] = Field(default_factory=list)
     questions: list[ArticleQuestionPublic] = Field(default_factory=list)
+
+
+class LearningTextbookPublic(BaseModel):
+    id: str
+    name: str
+    article_count: int = 0
+
+
+class LearningArticleSummaryPublic(BaseModel):
+    id: str
+    textbook_id: str
+    title: str
+    question_count: int = 0
+
+
+class LearningArticleQuestionPublic(BaseModel):
+    id: str
+    article_id: str
+    question: str = Field(min_length=1)
+    options: dict[Literal["A", "B", "C", "D"], str]
+    difficulty: Optional[str] = None
+    question_type: str = "multiple_choice"
+    order_index: int
+
+    @field_validator("options")
+    @classmethod
+    def validate_options(cls, value: dict[str, str]) -> dict[str, str]:
+        expected_keys = {"A", "B", "C", "D"}
+        if set(value) != expected_keys:
+            raise ValueError("选项必须包含 A、B、C、D")
+        normalized = {key: option.strip() for key, option in value.items()}
+        if any(not option for option in normalized.values()):
+            raise ValueError("选项不能为空")
+        return normalized
+
+
+class LearningArticleDetailPublic(ArticleBase):
+    id: str
+    textbook_id: str
+    audio_url: str = Field(default="", max_length=512)
+    sentences: list[ArticleSentence] = Field(default_factory=list)
+    key_points: list[ArticleKeyPoint] = Field(default_factory=list)
+    questions: list[LearningArticleQuestionPublic] = Field(default_factory=list)
+
+
+class LearningAnswerSubmission(BaseModel):
+    answers: dict[str, Literal["A", "B", "C", "D"]]
+
+
+class LearningAnswerResultItem(BaseModel):
+    question_id: str
+    submitted_answer: Literal["A", "B", "C", "D"]
+    correct_answer: Literal["A", "B", "C", "D"]
+    is_correct: bool
+    explanation: Optional[str] = None
+
+
+class LearningAnswerSubmissionResult(BaseModel):
+    article_id: str
+    total: int
+    correct: int
+    items: list[LearningAnswerResultItem]

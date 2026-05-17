@@ -189,6 +189,180 @@ export type HttpValidationError = {
 };
 
 /**
+ * LearningAnswerResultItem
+ */
+export type LearningAnswerResultItem = {
+    /**
+     * Question Id
+     */
+    question_id: string;
+    /**
+     * Submitted Answer
+     */
+    submitted_answer: 'A' | 'B' | 'C' | 'D';
+    /**
+     * Correct Answer
+     */
+    correct_answer: 'A' | 'B' | 'C' | 'D';
+    /**
+     * Is Correct
+     */
+    is_correct: boolean;
+    /**
+     * Explanation
+     */
+    explanation?: string | null;
+};
+
+/**
+ * LearningAnswerSubmission
+ */
+export type LearningAnswerSubmission = {
+    /**
+     * Answers
+     */
+    answers: {
+        [key: string]: 'A' | 'B' | 'C' | 'D';
+    };
+};
+
+/**
+ * LearningAnswerSubmissionResult
+ */
+export type LearningAnswerSubmissionResult = {
+    /**
+     * Article Id
+     */
+    article_id: string;
+    /**
+     * Total
+     */
+    total: number;
+    /**
+     * Correct
+     */
+    correct: number;
+    /**
+     * Items
+     */
+    items: Array<LearningAnswerResultItem>;
+};
+
+/**
+ * LearningArticleDetailPublic
+ */
+export type LearningArticleDetailPublic = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Content
+     */
+    content?: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Textbook Id
+     */
+    textbook_id: string;
+    /**
+     * Audio Url
+     */
+    audio_url?: string;
+    /**
+     * Sentences
+     */
+    sentences?: Array<ArticleSentence>;
+    /**
+     * Key Points
+     */
+    key_points?: Array<ArticleKeyPoint>;
+    /**
+     * Questions
+     */
+    questions?: Array<LearningArticleQuestionPublic>;
+};
+
+/**
+ * LearningArticleQuestionPublic
+ */
+export type LearningArticleQuestionPublic = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Article Id
+     */
+    article_id: string;
+    /**
+     * Question
+     */
+    question: string;
+    /**
+     * Options
+     */
+    options: {
+        [key: string]: string;
+    };
+    /**
+     * Difficulty
+     */
+    difficulty?: string | null;
+    /**
+     * Question Type
+     */
+    question_type?: string;
+    /**
+     * Order Index
+     */
+    order_index: number;
+};
+
+/**
+ * LearningArticleSummaryPublic
+ */
+export type LearningArticleSummaryPublic = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Textbook Id
+     */
+    textbook_id: string;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Question Count
+     */
+    question_count?: number;
+};
+
+/**
+ * LearningTextbookPublic
+ */
+export type LearningTextbookPublic = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Article Count
+     */
+    article_count?: number;
+};
+
+/**
  * LoginRequest
  */
 export type LoginRequest = {
@@ -528,6 +702,116 @@ export type UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutResponses = {
 };
 
 export type UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutResponse = UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutResponses[keyof UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutResponses];
+
+export type ListLearningTextbooksLearningTextbooksGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/learning/textbooks';
+};
+
+export type ListLearningTextbooksLearningTextbooksGetResponses = {
+    /**
+     * Response List Learning Textbooks Learning Textbooks Get
+     *
+     * Successful Response
+     */
+    200: Array<LearningTextbookPublic>;
+};
+
+export type ListLearningTextbooksLearningTextbooksGetResponse = ListLearningTextbooksLearningTextbooksGetResponses[keyof ListLearningTextbooksLearningTextbooksGetResponses];
+
+export type ListLearningTextbookArticlesLearningTextbooksTextbookIdArticlesGetData = {
+    body?: never;
+    path: {
+        /**
+         * Textbook Id
+         */
+        textbook_id: string;
+    };
+    query?: never;
+    url: '/learning/textbooks/{textbook_id}/articles';
+};
+
+export type ListLearningTextbookArticlesLearningTextbooksTextbookIdArticlesGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListLearningTextbookArticlesLearningTextbooksTextbookIdArticlesGetError = ListLearningTextbookArticlesLearningTextbooksTextbookIdArticlesGetErrors[keyof ListLearningTextbookArticlesLearningTextbooksTextbookIdArticlesGetErrors];
+
+export type ListLearningTextbookArticlesLearningTextbooksTextbookIdArticlesGetResponses = {
+    /**
+     * Response List Learning Textbook Articles Learning Textbooks  Textbook Id  Articles Get
+     *
+     * Successful Response
+     */
+    200: Array<LearningArticleSummaryPublic>;
+};
+
+export type ListLearningTextbookArticlesLearningTextbooksTextbookIdArticlesGetResponse = ListLearningTextbookArticlesLearningTextbooksTextbookIdArticlesGetResponses[keyof ListLearningTextbookArticlesLearningTextbooksTextbookIdArticlesGetResponses];
+
+export type ReadLearningArticleLearningArticlesArticleIdGetData = {
+    body?: never;
+    path: {
+        /**
+         * Article Id
+         */
+        article_id: string;
+    };
+    query?: never;
+    url: '/learning/articles/{article_id}';
+};
+
+export type ReadLearningArticleLearningArticlesArticleIdGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReadLearningArticleLearningArticlesArticleIdGetError = ReadLearningArticleLearningArticlesArticleIdGetErrors[keyof ReadLearningArticleLearningArticlesArticleIdGetErrors];
+
+export type ReadLearningArticleLearningArticlesArticleIdGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: LearningArticleDetailPublic;
+};
+
+export type ReadLearningArticleLearningArticlesArticleIdGetResponse = ReadLearningArticleLearningArticlesArticleIdGetResponses[keyof ReadLearningArticleLearningArticlesArticleIdGetResponses];
+
+export type SubmitLearningArticleAnswersLearningArticlesArticleIdAnswersPostData = {
+    body: LearningAnswerSubmission;
+    path: {
+        /**
+         * Article Id
+         */
+        article_id: string;
+    };
+    query?: never;
+    url: '/learning/articles/{article_id}/answers';
+};
+
+export type SubmitLearningArticleAnswersLearningArticlesArticleIdAnswersPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SubmitLearningArticleAnswersLearningArticlesArticleIdAnswersPostError = SubmitLearningArticleAnswersLearningArticlesArticleIdAnswersPostErrors[keyof SubmitLearningArticleAnswersLearningArticlesArticleIdAnswersPostErrors];
+
+export type SubmitLearningArticleAnswersLearningArticlesArticleIdAnswersPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: LearningAnswerSubmissionResult;
+};
+
+export type SubmitLearningArticleAnswersLearningArticlesArticleIdAnswersPostResponse = SubmitLearningArticleAnswersLearningArticlesArticleIdAnswersPostResponses[keyof SubmitLearningArticleAnswersLearningArticlesArticleIdAnswersPostResponses];
 
 export type ListUsersUsersGetData = {
     body?: never;

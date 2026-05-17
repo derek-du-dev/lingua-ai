@@ -11,7 +11,7 @@ from article_processing import MEDIA_DIR
 from database import get_db
 from init_db import init_database
 from models import User, UserType
-from routers import articles, system_settings, textbooks, users
+from routers import articles, learning, system_settings, textbooks, users
 from schemas import LoginRequest, LoginResponse, UserPublic
 
 
@@ -26,6 +26,7 @@ app = FastAPI(title="Lingua API", lifespan=lifespan)
 MEDIA_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 app.include_router(articles.router)
+app.include_router(learning.router)
 app.include_router(users.router)
 app.include_router(textbooks.router)
 app.include_router(system_settings.router)

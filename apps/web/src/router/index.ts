@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AdminLayout from '../layouts/AdminLayout.vue'
 import LoginView from '../views/LoginView.vue'
 import StudentHomeView from '../views/StudentHomeView.vue'
+import StudentIntensiveListeningView from '../views/StudentIntensiveListeningView.vue'
+import StudentLearningView from '../views/StudentLearningView.vue'
 import SystemSettingsView from '../views/SystemSettingsView.vue'
 import TextbookManagementView from '../views/TextbookManagementView.vue'
 import UserManagementView from '../views/UserManagementView.vue'
@@ -42,7 +44,11 @@ const router = createRouter({
       path: '/learn',
       component: AdminLayout,
       meta: { requiresAuthenticated: true },
-      children: [{ path: '', component: StudentHomeView }],
+      children: [
+        { path: '', component: StudentHomeView },
+        { path: 'articles/:articleId/intensive-listening', component: StudentIntensiveListeningView },
+        { path: 'articles/:articleId', component: StudentLearningView },
+      ],
     },
   ],
 })
