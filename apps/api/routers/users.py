@@ -7,6 +7,7 @@ from auth import get_password_hash, require_admin
 from database import get_db
 from models import User, UserType
 from schemas import ResetPasswordResponse, UserCreate, UserPublic, UserUpdate
+from system_settings import get_system_settings
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -125,6 +126,7 @@ def reset_user_password(
     if user.username == "admin":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="内置管理员不能重置密码")
 
-    user.password_hash = get_password_hash("123qwe")
+    default_password = get_system_settings().default_password
+    user.password_hash = get_password_hash(default_password)
     db.commit()
-    return ResetPasswordResponse(message="密码已重置为 123qwe")
+    return ResetPasswordResponse(message=f"密码已重置为 {default_password}")

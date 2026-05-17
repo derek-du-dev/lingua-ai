@@ -126,6 +126,34 @@ export type ResetPasswordResponse = {
 };
 
 /**
+ * SystemSettingsPublic
+ */
+export type SystemSettingsPublic = {
+    /**
+     * Default Password
+     */
+    default_password: string;
+    /**
+     * Edge Tts Rate
+     */
+    edge_tts_rate: number;
+};
+
+/**
+ * SystemSettingsUpdate
+ */
+export type SystemSettingsUpdate = {
+    /**
+     * Default Password
+     */
+    default_password: string;
+    /**
+     * Edge Tts Rate
+     */
+    edge_tts_rate: number;
+};
+
+/**
  * TextbookCreate
  */
 export type TextbookCreate = {
@@ -602,6 +630,47 @@ export type CreateTextbookArticleTextbooksTextbookIdArticlesPostResponses = {
 };
 
 export type CreateTextbookArticleTextbooksTextbookIdArticlesPostResponse = CreateTextbookArticleTextbooksTextbookIdArticlesPostResponses[keyof CreateTextbookArticleTextbooksTextbookIdArticlesPostResponses];
+
+export type ReadSystemSettingsSystemSettingsGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/system-settings';
+};
+
+export type ReadSystemSettingsSystemSettingsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: SystemSettingsPublic;
+};
+
+export type ReadSystemSettingsSystemSettingsGetResponse = ReadSystemSettingsSystemSettingsGetResponses[keyof ReadSystemSettingsSystemSettingsGetResponses];
+
+export type SaveSystemSettingsSystemSettingsPutData = {
+    body: SystemSettingsUpdate;
+    path?: never;
+    query?: never;
+    url: '/system-settings';
+};
+
+export type SaveSystemSettingsSystemSettingsPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SaveSystemSettingsSystemSettingsPutError = SaveSystemSettingsSystemSettingsPutErrors[keyof SaveSystemSettingsSystemSettingsPutErrors];
+
+export type SaveSystemSettingsSystemSettingsPutResponses = {
+    /**
+     * Successful Response
+     */
+    200: SystemSettingsPublic;
+};
+
+export type SaveSystemSettingsSystemSettingsPutResponse = SaveSystemSettingsSystemSettingsPutResponses[keyof SaveSystemSettingsSystemSettingsPutResponses];
 
 export type ReadRootGetData = {
     body?: never;

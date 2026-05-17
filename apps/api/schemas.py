@@ -53,6 +53,23 @@ class ResetPasswordResponse(BaseModel):
     message: str
 
 
+class SystemSettingsUpdate(BaseModel):
+    default_password: str = Field(min_length=1)
+    edge_tts_rate: float = Field(ge=0, le=1)
+
+    @field_validator("default_password")
+    @classmethod
+    def normalize_default_password(cls, value: str) -> str:
+        password = value.strip()
+        if not password:
+            raise ValueError("默认密码不能为空")
+        return password
+
+
+class SystemSettingsPublic(SystemSettingsUpdate):
+    pass
+
+
 class TextbookCreate(BaseModel):
     name: str = Field(min_length=1, max_length=128)
 

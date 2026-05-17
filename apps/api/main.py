@@ -11,7 +11,7 @@ from article_processing import MEDIA_DIR
 from database import get_db
 from init_db import init_database
 from models import User, UserType
-from routers import articles, textbooks, users
+from routers import articles, system_settings, textbooks, users
 from schemas import LoginRequest, LoginResponse, UserPublic
 
 
@@ -28,6 +28,7 @@ app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 app.include_router(articles.router)
 app.include_router(users.router)
 app.include_router(textbooks.router)
+app.include_router(system_settings.router)
 
 
 def to_user_public(user: User) -> UserPublic:

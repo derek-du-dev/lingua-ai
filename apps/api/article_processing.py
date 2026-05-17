@@ -8,6 +8,7 @@ import spacy
 from fastapi import HTTPException, status
 
 from database import DATA_DIR
+from system_settings import get_edge_tts_rate_string
 
 MEDIA_DIR = DATA_DIR / "media"
 AUDIO_DIR = MEDIA_DIR / "audio" / "articles"
@@ -60,8 +61,11 @@ async def save_tts_audio(text: str, output_path: Path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     temp_path = output_path.with_suffix(".tmp.mp3")
     voice = os.getenv("LINGUA_TTS_VOICE", DEFAULT_VOICE)
-    rate = os.getenv("LINGUA_TTS_RATE", "+0%")
-    communicate = edge_tts.Communicate(text=text, voice=voice, rate=rate)
+    communicate = edge_tts.Communicate(
+        text=text,
+        voice=voice,
+        rate=get_edge_tts_rate_string(),
+    )
     await communicate.save(str(temp_path))
     temp_path.replace(output_path)
 

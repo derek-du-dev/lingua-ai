@@ -47,6 +47,14 @@ async function handleLogout() {
             用户管理
           </RouterLink>
           <RouterLink
+            v-if="isAdmin()"
+            class="block rounded-2xl px-4 py-3 text-sm font-black text-slate-600 transition hover:bg-sky-50 hover:text-sky-700"
+            active-class="bg-sky-600 text-white shadow-lg shadow-sky-200 hover:bg-sky-600 hover:text-white"
+            to="/admin/settings"
+          >
+            系统参数
+          </RouterLink>
+          <RouterLink
             v-if="isManager()"
             class="block rounded-2xl px-4 py-3 text-sm font-black text-slate-600 transition hover:bg-sky-50 hover:text-sky-700"
             active-class="bg-sky-600 text-white shadow-lg shadow-sky-200 hover:bg-sky-600 hover:text-white"

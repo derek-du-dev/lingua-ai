@@ -172,7 +172,7 @@ async function handleLogin() {
               </form>
 
               <div class="mt-6 rounded-3xl bg-gradient-to-r from-sky-50 to-yellow-50 px-4 py-3 text-center text-xs font-semibold leading-5 text-slate-500">
-                小提示：默认演示账号可使用 admin / 123qwe。
+                小提示：初始演示账号可使用 admin / 123qwe，默认密码可在系统参数中修改。
               </div>
             </div>
           </div>

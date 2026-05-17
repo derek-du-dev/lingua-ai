@@ -3,6 +3,7 @@ from sqlalchemy import text
 from auth import get_password_hash
 from database import DATA_DIR, SessionLocal, engine
 from models import Base, User, UserType
+from system_settings import get_system_settings
 
 
 def drop_article_keywords_column() -> None:
@@ -27,7 +28,7 @@ def init_database() -> None:
         db.add(
             User(
                 username="admin",
-                password_hash=get_password_hash("123qwe"),
+                password_hash=get_password_hash(get_system_settings().default_password),
                 user_type=UserType.ADMIN,
             )
         )

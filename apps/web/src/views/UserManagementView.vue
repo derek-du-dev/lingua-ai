@@ -118,7 +118,7 @@ async function resetPassword(user: UserPublic) {
 
   const confirmed = await notify.confirm({
     title: '确认重置密码',
-    message: `确定要将用户“${user.username}”的密码重置为 123qwe 吗？`,
+    message: `确定要将用户“${user.username}”的密码重置为系统默认密码吗？`,
     confirmText: '重置密码',
     variant: 'danger',
   })

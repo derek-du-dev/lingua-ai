@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AdminLayout from '../layouts/AdminLayout.vue'
 import LoginView from '../views/LoginView.vue'
 import StudentHomeView from '../views/StudentHomeView.vue'
+import SystemSettingsView from '../views/SystemSettingsView.vue'
 import TextbookManagementView from '../views/TextbookManagementView.vue'
 import UserManagementView from '../views/UserManagementView.vue'
 import { isAdmin, isAuthenticated, isManager, restoreSession } from '../services/auth'
@@ -28,6 +29,7 @@ const router = createRouter({
       redirect: () => getDefaultManagementPath(),
       children: [
         { path: 'users', component: UserManagementView, meta: { requiresAdmin: true } },
+        { path: 'settings', component: SystemSettingsView, meta: { requiresAdmin: true } },
       ],
     },
     {
