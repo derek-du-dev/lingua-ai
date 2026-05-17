@@ -1,5 +1,4 @@
 import asyncio
-import os
 import re
 import shutil
 from pathlib import Path
@@ -7,13 +6,13 @@ from pathlib import Path
 import spacy
 from fastapi import HTTPException, status
 
+from app_config import get_app_settings
 from database import DATA_DIR
 from system_settings import get_edge_tts_rate_string
 
 MEDIA_DIR = DATA_DIR / "media"
 AUDIO_DIR = MEDIA_DIR / "audio" / "articles"
 MEDIA_URL_PREFIX = "/media"
-DEFAULT_VOICE = "en-US-JennyNeural"
 
 _nlp = None
 
@@ -65,10 +64,10 @@ async def save_tts_audio(text: str, output_path: Path) -> None:
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     temp_path = output_path.with_suffix(".tmp.mp3")
-    voice = os.getenv("LINGUA_TTS_VOICE", DEFAULT_VOICE)
+    settings = get_app_settings()
     communicate = edge_tts.Communicate(
         text=text,
-        voice=voice,
+        voice=settings.tts_voice,
         rate=get_edge_tts_rate_string(),
     )
     await communicate.save(str(temp_path))

@@ -1,4 +1,3 @@
-import os
 from datetime import datetime, timedelta
 from secrets import token_urlsafe
 from typing import Optional
@@ -9,6 +8,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
+from app_config import get_app_settings
 from database import DATA_DIR, get_db
 from models import User, UserType
 
@@ -29,9 +29,9 @@ def verify_password(plain_password: str, password_hash: str) -> bool:
 
 
 def get_jwt_secret() -> str:
-    env_secret = os.getenv("LINGUA_JWT_SECRET")
-    if env_secret:
-        return env_secret
+    settings = get_app_settings()
+    if settings.jwt_secret:
+        return settings.jwt_secret
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     if SECRET_FILE.exists():
