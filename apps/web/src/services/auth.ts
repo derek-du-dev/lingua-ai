@@ -39,6 +39,10 @@ export function isAdmin() {
   return authState.user?.user_type === 3
 }
 
+export function isManager() {
+  return authState.user?.user_type === 2 || authState.user?.user_type === 3
+}
+
 export async function login(username: string, password: string) {
   const result = await loginAuthLoginPost({
     body: {

@@ -1,8 +1,8 @@
 from datetime import datetime
 from enum import IntEnum
 
-from sqlalchemy import Column, DateTime, Integer, String
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy.orm import declarative_base, relationship
 from uuid6 import uuid7
 
 Base = declarative_base()
@@ -42,3 +42,18 @@ class Textbook(Base):
 
     id = Column(String(36), primary_key=True, default=new_uuid7)
     name = Column(String(128), unique=True, index=True, nullable=False)
+    articles = relationship("Article", back_populates="textbook", cascade="all, delete-orphan")
+
+
+class Article(Base):
+    __tablename__ = "articles"
+
+    id = Column(String(36), primary_key=True, default=new_uuid7)
+    textbook_id = Column(String(36), ForeignKey("textbooks.id", ondelete="CASCADE"), index=True, nullable=False)
+    title = Column(String(255), index=True, nullable=False)
+    content = Column(Text, nullable=False, default="")
+    keywords = Column(JSON, nullable=False, default=list)
+    audio_url = Column(String(512), nullable=False, default="")
+    sentences = Column(JSON, nullable=False, default=list)
+
+    textbook = relationship("Textbook", back_populates="articles")

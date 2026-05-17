@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { login, logout } from '../services/auth'
+import { login } from '../services/auth'
 import { notify } from '../services/notify'
 
 const router = useRouter()
@@ -9,8 +9,26 @@ const username = ref('')
 const password = ref('')
 const loading = ref(false)
 const error = ref('')
+const rememberAccount = ref(true)
+
+const REMEMBERED_ACCOUNT_KEY = 'lingua_ai_remembered_account'
 
 const canSubmit = computed(() => username.value.trim().length > 0 && password.value.length > 0 && !loading.value)
+
+function getDefaultManagementPath(userType: number) {
+  if (userType === 3) {
+    return '/admin/users'
+  }
+
+  return userType === 2 ? '/textbooks' : '/learn'
+}
+
+onMounted(() => {
+  const rememberedAccount = localStorage.getItem(REMEMBERED_ACCOUNT_KEY)
+  if (rememberedAccount) {
+    username.value = rememberedAccount
+  }
+})
 
 async function handleLogin() {
   if (!canSubmit.value) {
@@ -25,15 +43,14 @@ async function handleLogin() {
     const user = await login(username.value.trim(), password.value)
     password.value = ''
 
-    if (user.user_type !== 3) {
-      logout()
-      error.value = '当前账号无管理权限。'
-      notify.warning(error.value)
-      return
+    if (rememberAccount.value) {
+      localStorage.setItem(REMEMBERED_ACCOUNT_KEY, user.username)
+    } else {
+      localStorage.removeItem(REMEMBERED_ACCOUNT_KEY)
     }
 
     notify.success(`欢迎回来，${user.username}`)
-    await router.push('/admin/users')
+    await router.push(getDefaultManagementPath(user.user_type))
   } catch (err) {
     error.value = err instanceof Error ? err.message : '登录遇到了一点小问题，请稍后再试。'
   } finally {
@@ -53,11 +70,11 @@ async function handleLogin() {
         <div class="order-2 text-center lg:order-1 lg:text-left">
           <div class="mb-6 inline-flex items-center gap-3 rounded-full border-2 border-white/80 bg-white/70 px-4 py-2 text-sm font-bold text-sky-700 shadow-lg shadow-sky-200/60 backdrop-blur">
             <span class="h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(52,211,153,0.18)]" />
-            Lingua AI 管理后台
+            Lingua Studio
           </div>
 
           <h1 class="text-4xl font-black leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-            管理你的
+            进入你的
             <span class="relative inline-block text-sky-600">
               语言课堂
               <span class="absolute -bottom-1 left-0 h-3 w-full rounded-full bg-yellow-300/70 -z-10" />
@@ -65,7 +82,7 @@ async function handleLogin() {
           </h1>
 
           <p class="mx-auto mt-5 max-w-xl text-lg leading-8 text-slate-600 lg:mx-0">
-            登录后管理用户账号、教材内容和课堂基础数据，让学习体验保持清晰有序。
+            老师、学生和管理员都从这里登录，进入各自的学习、教学与内容工作空间。
           </p>
 
           <div class="mt-8 grid gap-4 sm:grid-cols-3">
@@ -73,22 +90,22 @@ async function handleLogin() {
               <div class="mx-auto mb-3 h-12 w-12 rounded-2xl bg-sky-200 p-2 lg:mx-0">
                 <div class="h-full w-full rounded-xl bg-sky-500" />
               </div>
-              <p class="text-sm font-bold text-slate-900">用户管理</p>
-              <p class="mt-1 text-xs text-slate-500">维护账号权限</p>
+              <p class="text-sm font-bold text-slate-900">学习入口</p>
+              <p class="mt-1 text-xs text-slate-500">学生进入课堂</p>
             </div>
             <div class="rounded-3xl border-2 border-white bg-white/70 p-4 shadow-lg shadow-amber-200/50">
               <div class="mx-auto mb-3 h-12 w-12 rounded-2xl bg-amber-200 p-2 lg:mx-0">
                 <div class="h-full w-full rounded-xl bg-amber-500" />
               </div>
               <p class="text-sm font-bold text-slate-900">教材管理</p>
-              <p class="mt-1 text-xs text-slate-500">整理教材目录</p>
+              <p class="mt-1 text-xs text-slate-500">老师维护内容</p>
             </div>
             <div class="rounded-3xl border-2 border-white bg-white/70 p-4 shadow-lg shadow-pink-200/50">
               <div class="mx-auto mb-3 h-12 w-12 rounded-2xl bg-pink-200 p-2 lg:mx-0">
                 <div class="h-full w-full rounded-xl bg-pink-500" />
               </div>
-              <p class="text-sm font-bold text-slate-900">安全权限</p>
-              <p class="mt-1 text-xs text-slate-500">仅管理员可进入</p>
+              <p class="text-sm font-bold text-slate-900">账号协作</p>
+              <p class="mt-1 text-xs text-slate-500">按角色分配空间</p>
             </div>
           </div>
         </div>
@@ -102,8 +119,8 @@ async function handleLogin() {
             <div class="relative rounded-[2.5rem] border-4 border-white bg-white/90 p-6 shadow-2xl shadow-sky-200/70 backdrop-blur sm:p-8">
               <div class="text-center">
                 <p class="text-sm font-black uppercase tracking-[0.3em] text-sky-500">Welcome Back</p>
-                <h2 class="mt-2 text-3xl font-black text-slate-900">管理员登录</h2>
-                <p class="mt-2 text-sm leading-6 text-slate-500">输入管理员账号，进入 Lingua AI 管理后台。</p>
+                <h2 class="mt-2 text-3xl font-black text-slate-900">登录 Lingua Studio</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-500">输入账号密码，进入与你角色对应的工作空间。</p>
               </div>
 
               <form class="mt-7 space-y-5" @submit.prevent="handleLogin">
@@ -129,6 +146,15 @@ async function handleLogin() {
                   >
                 </label>
 
+                <label class="flex items-center gap-3 text-sm font-bold text-slate-600">
+                  <input
+                    v-model="rememberAccount"
+                    class="h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-200"
+                    type="checkbox"
+                  >
+                  记住账号
+                </label>
+
                 <p v-if="error" class="rounded-2xl border-2 border-rose-100 bg-rose-50 px-4 py-3 text-left text-sm font-bold text-rose-600">
                   {{ error }}
                 </p>
@@ -139,7 +165,7 @@ async function handleLogin() {
                   type="submit"
                 >
                   <span class="inline-flex items-center justify-center gap-2">
-                    {{ loading ? '正在登录...' : '进入管理后台' }}
+                    {{ loading ? '正在登录...' : '登录' }}
                     <span class="transition group-hover:translate-x-1">→</span>
                   </span>
                 </button>

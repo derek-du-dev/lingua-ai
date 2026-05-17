@@ -9,7 +9,7 @@ from auth import create_access_token, get_current_user, verify_password
 from database import get_db
 from init_db import init_database
 from models import User, UserType
-from routers import textbooks, users
+from routers import articles, textbooks, users
 from schemas import LoginRequest, LoginResponse, UserPublic
 
 
@@ -20,6 +20,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Lingua API", lifespan=lifespan)
+app.include_router(articles.router)
 app.include_router(users.router)
 app.include_router(textbooks.router)
 

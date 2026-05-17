@@ -92,3 +92,15 @@ def require_admin(current_user: User = Depends(get_current_user)) -> User:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin permission required")
 
     return current_user
+
+
+def require_teacher_or_admin(current_user: User = Depends(get_current_user)) -> User:
+    try:
+        user_type = UserType(current_user.user_type)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Management permission required") from exc
+
+    if user_type not in {UserType.TEACHER, UserType.ADMIN}:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Management permission required")
+
+    return current_user

@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateTextbookTextbooksPostData, CreateTextbookTextbooksPostErrors, CreateTextbookTextbooksPostResponses, CreateUserUsersPostData, CreateUserUsersPostErrors, CreateUserUsersPostResponses, DeleteTextbookTextbooksTextbookIdDeleteData, DeleteTextbookTextbooksTextbookIdDeleteErrors, DeleteTextbookTextbooksTextbookIdDeleteResponses, DeleteUserUsersUserIdDeleteData, DeleteUserUsersUserIdDeleteErrors, DeleteUserUsersUserIdDeleteResponses, HealthCheckHealthGetData, HealthCheckHealthGetResponses, ListTextbooksTextbooksGetData, ListTextbooksTextbooksGetResponses, ListUsersUsersGetData, ListUsersUsersGetResponses, LoginAuthLoginPostData, LoginAuthLoginPostErrors, LoginAuthLoginPostResponses, ReadCurrentUserAuthMeGetData, ReadCurrentUserAuthMeGetResponses, ReadRootGetData, ReadRootGetResponses, ResetUserPasswordUsersUserIdResetPasswordPostData, ResetUserPasswordUsersUserIdResetPasswordPostErrors, ResetUserPasswordUsersUserIdResetPasswordPostResponses, UpdateTextbookTextbooksTextbookIdPutData, UpdateTextbookTextbooksTextbookIdPutErrors, UpdateTextbookTextbooksTextbookIdPutResponses, UpdateUserUsersUserIdPutData, UpdateUserUsersUserIdPutErrors, UpdateUserUsersUserIdPutResponses } from './types.gen';
+import type { CreateTextbookArticleTextbooksTextbookIdArticlesPostData, CreateTextbookArticleTextbooksTextbookIdArticlesPostErrors, CreateTextbookArticleTextbooksTextbookIdArticlesPostResponses, CreateTextbookTextbooksPostData, CreateTextbookTextbooksPostErrors, CreateTextbookTextbooksPostResponses, CreateUserUsersPostData, CreateUserUsersPostErrors, CreateUserUsersPostResponses, DeleteArticleArticlesArticleIdDeleteData, DeleteArticleArticlesArticleIdDeleteErrors, DeleteArticleArticlesArticleIdDeleteResponses, DeleteTextbookTextbooksTextbookIdDeleteData, DeleteTextbookTextbooksTextbookIdDeleteErrors, DeleteTextbookTextbooksTextbookIdDeleteResponses, DeleteUserUsersUserIdDeleteData, DeleteUserUsersUserIdDeleteErrors, DeleteUserUsersUserIdDeleteResponses, HealthCheckHealthGetData, HealthCheckHealthGetResponses, ListTextbookArticlesTextbooksTextbookIdArticlesGetData, ListTextbookArticlesTextbooksTextbookIdArticlesGetErrors, ListTextbookArticlesTextbooksTextbookIdArticlesGetResponses, ListTextbooksTextbooksGetData, ListTextbooksTextbooksGetResponses, ListUsersUsersGetData, ListUsersUsersGetResponses, LoginAuthLoginPostData, LoginAuthLoginPostErrors, LoginAuthLoginPostResponses, ReadCurrentUserAuthMeGetData, ReadCurrentUserAuthMeGetResponses, ReadRootGetData, ReadRootGetResponses, ResetUserPasswordUsersUserIdResetPasswordPostData, ResetUserPasswordUsersUserIdResetPasswordPostErrors, ResetUserPasswordUsersUserIdResetPasswordPostResponses, UpdateArticleArticlesArticleIdPutData, UpdateArticleArticlesArticleIdPutErrors, UpdateArticleArticlesArticleIdPutResponses, UpdateTextbookTextbooksTextbookIdPutData, UpdateTextbookTextbooksTextbookIdPutErrors, UpdateTextbookTextbooksTextbookIdPutResponses, UpdateUserUsersUserIdPutData, UpdateUserUsersUserIdPutErrors, UpdateUserUsersUserIdPutResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -17,6 +17,28 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: Record<string, unknown>;
 };
+
+/**
+ * Delete Article
+ */
+export const deleteArticleArticlesArticleIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteArticleArticlesArticleIdDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteArticleArticlesArticleIdDeleteResponses, DeleteArticleArticlesArticleIdDeleteErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/articles/{article_id}',
+    ...options
+});
+
+/**
+ * Update Article
+ */
+export const updateArticleArticlesArticleIdPut = <ThrowOnError extends boolean = false>(options: Options<UpdateArticleArticlesArticleIdPutData, ThrowOnError>) => (options.client ?? client).put<UpdateArticleArticlesArticleIdPutResponses, UpdateArticleArticlesArticleIdPutErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/articles/{article_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * List Users
@@ -108,6 +130,28 @@ export const deleteTextbookTextbooksTextbookIdDelete = <ThrowOnError extends boo
 export const updateTextbookTextbooksTextbookIdPut = <ThrowOnError extends boolean = false>(options: Options<UpdateTextbookTextbooksTextbookIdPutData, ThrowOnError>) => (options.client ?? client).put<UpdateTextbookTextbooksTextbookIdPutResponses, UpdateTextbookTextbooksTextbookIdPutErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/textbooks/{textbook_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List Textbook Articles
+ */
+export const listTextbookArticlesTextbooksTextbookIdArticlesGet = <ThrowOnError extends boolean = false>(options: Options<ListTextbookArticlesTextbooksTextbookIdArticlesGetData, ThrowOnError>) => (options.client ?? client).get<ListTextbookArticlesTextbooksTextbookIdArticlesGetResponses, ListTextbookArticlesTextbooksTextbookIdArticlesGetErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/textbooks/{textbook_id}/articles',
+    ...options
+});
+
+/**
+ * Create Textbook Article
+ */
+export const createTextbookArticleTextbooksTextbookIdArticlesPost = <ThrowOnError extends boolean = false>(options: Options<CreateTextbookArticleTextbooksTextbookIdArticlesPostData, ThrowOnError>) => (options.client ?? client).post<CreateTextbookArticleTextbooksTextbookIdArticlesPostResponses, CreateTextbookArticleTextbooksTextbookIdArticlesPostErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/textbooks/{textbook_id}/articles',
     ...options,
     headers: {
         'Content-Type': 'application/json',

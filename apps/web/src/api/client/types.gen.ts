@@ -5,6 +5,106 @@ export type ClientOptions = {
 };
 
 /**
+ * ArticleCreate
+ */
+export type ArticleCreate = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Content
+     */
+    content?: string;
+    /**
+     * Keywords
+     */
+    keywords?: Array<string>;
+    /**
+     * Audio Url
+     */
+    audio_url?: string;
+    /**
+     * Sentences
+     */
+    sentences?: Array<ArticleSentence>;
+};
+
+/**
+ * ArticlePublic
+ */
+export type ArticlePublic = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Content
+     */
+    content?: string;
+    /**
+     * Keywords
+     */
+    keywords?: Array<string>;
+    /**
+     * Audio Url
+     */
+    audio_url?: string;
+    /**
+     * Sentences
+     */
+    sentences?: Array<ArticleSentence>;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Textbook Id
+     */
+    textbook_id: string;
+};
+
+/**
+ * ArticleSentence
+ */
+export type ArticleSentence = {
+    /**
+     * Content
+     */
+    content: string;
+    /**
+     * Audio Url
+     */
+    audio_url?: string;
+};
+
+/**
+ * ArticleUpdate
+ */
+export type ArticleUpdate = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Content
+     */
+    content?: string;
+    /**
+     * Keywords
+     */
+    keywords?: Array<string>;
+    /**
+     * Audio Url
+     */
+    audio_url?: string;
+    /**
+     * Sentences
+     */
+    sentences?: Array<ArticleSentence>;
+};
+
+/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -172,6 +272,66 @@ export type ValidationError = {
         [key: string]: unknown;
     };
 };
+
+export type DeleteArticleArticlesArticleIdDeleteData = {
+    body?: never;
+    path: {
+        /**
+         * Article Id
+         */
+        article_id: string;
+    };
+    query?: never;
+    url: '/articles/{article_id}';
+};
+
+export type DeleteArticleArticlesArticleIdDeleteErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteArticleArticlesArticleIdDeleteError = DeleteArticleArticlesArticleIdDeleteErrors[keyof DeleteArticleArticlesArticleIdDeleteErrors];
+
+export type DeleteArticleArticlesArticleIdDeleteResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteArticleArticlesArticleIdDeleteResponse = DeleteArticleArticlesArticleIdDeleteResponses[keyof DeleteArticleArticlesArticleIdDeleteResponses];
+
+export type UpdateArticleArticlesArticleIdPutData = {
+    body: ArticleUpdate;
+    path: {
+        /**
+         * Article Id
+         */
+        article_id: string;
+    };
+    query?: never;
+    url: '/articles/{article_id}';
+};
+
+export type UpdateArticleArticlesArticleIdPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateArticleArticlesArticleIdPutError = UpdateArticleArticlesArticleIdPutErrors[keyof UpdateArticleArticlesArticleIdPutErrors];
+
+export type UpdateArticleArticlesArticleIdPutResponses = {
+    /**
+     * Successful Response
+     */
+    200: ArticlePublic;
+};
+
+export type UpdateArticleArticlesArticleIdPutResponse = UpdateArticleArticlesArticleIdPutResponses[keyof UpdateArticleArticlesArticleIdPutResponses];
 
 export type ListUsersUsersGetData = {
     body?: never;
@@ -408,6 +568,68 @@ export type UpdateTextbookTextbooksTextbookIdPutResponses = {
 };
 
 export type UpdateTextbookTextbooksTextbookIdPutResponse = UpdateTextbookTextbooksTextbookIdPutResponses[keyof UpdateTextbookTextbooksTextbookIdPutResponses];
+
+export type ListTextbookArticlesTextbooksTextbookIdArticlesGetData = {
+    body?: never;
+    path: {
+        /**
+         * Textbook Id
+         */
+        textbook_id: string;
+    };
+    query?: never;
+    url: '/textbooks/{textbook_id}/articles';
+};
+
+export type ListTextbookArticlesTextbooksTextbookIdArticlesGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListTextbookArticlesTextbooksTextbookIdArticlesGetError = ListTextbookArticlesTextbooksTextbookIdArticlesGetErrors[keyof ListTextbookArticlesTextbooksTextbookIdArticlesGetErrors];
+
+export type ListTextbookArticlesTextbooksTextbookIdArticlesGetResponses = {
+    /**
+     * Response List Textbook Articles Textbooks  Textbook Id  Articles Get
+     *
+     * Successful Response
+     */
+    200: Array<ArticlePublic>;
+};
+
+export type ListTextbookArticlesTextbooksTextbookIdArticlesGetResponse = ListTextbookArticlesTextbooksTextbookIdArticlesGetResponses[keyof ListTextbookArticlesTextbooksTextbookIdArticlesGetResponses];
+
+export type CreateTextbookArticleTextbooksTextbookIdArticlesPostData = {
+    body: ArticleCreate;
+    path: {
+        /**
+         * Textbook Id
+         */
+        textbook_id: string;
+    };
+    query?: never;
+    url: '/textbooks/{textbook_id}/articles';
+};
+
+export type CreateTextbookArticleTextbooksTextbookIdArticlesPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateTextbookArticleTextbooksTextbookIdArticlesPostError = CreateTextbookArticleTextbooksTextbookIdArticlesPostErrors[keyof CreateTextbookArticleTextbooksTextbookIdArticlesPostErrors];
+
+export type CreateTextbookArticleTextbooksTextbookIdArticlesPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: ArticlePublic;
+};
+
+export type CreateTextbookArticleTextbooksTextbookIdArticlesPostResponse = CreateTextbookArticleTextbooksTextbookIdArticlesPostResponses[keyof CreateTextbookArticleTextbooksTextbookIdArticlesPostResponses];
 
 export type ReadRootGetData = {
     body?: never;

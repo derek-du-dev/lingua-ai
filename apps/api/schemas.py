@@ -80,3 +80,65 @@ class TextbookUpdate(BaseModel):
 class TextbookPublic(BaseModel):
     id: str
     name: str
+
+
+class ArticleSentence(BaseModel):
+    content: str = Field(min_length=1)
+    audio_url: str = ""
+
+    @field_validator("content")
+    @classmethod
+    def normalize_content(cls, value: str) -> str:
+        content = value.strip()
+        if not content:
+            raise ValueError("句子内容不能为空")
+        return content
+
+    @field_validator("audio_url")
+    @classmethod
+    def normalize_audio_url(cls, value: str) -> str:
+        return value.strip()
+
+
+class ArticleBase(BaseModel):
+    title: str = Field(min_length=1, max_length=255)
+    content: str = ""
+    keywords: list[str] = Field(default_factory=list)
+    audio_url: str = Field(default="", max_length=512)
+    sentences: list[ArticleSentence] = Field(default_factory=list)
+
+    @field_validator("title")
+    @classmethod
+    def normalize_title(cls, value: str) -> str:
+        title = value.strip()
+        if not title:
+            raise ValueError("文章标题不能为空")
+        return title
+
+    @field_validator("content")
+    @classmethod
+    def normalize_content(cls, value: str) -> str:
+        return value.strip()
+
+    @field_validator("keywords")
+    @classmethod
+    def normalize_keywords(cls, value: list[str]) -> list[str]:
+        return [keyword.strip() for keyword in value if keyword.strip()]
+
+    @field_validator("audio_url")
+    @classmethod
+    def normalize_audio_url(cls, value: str) -> str:
+        return value.strip()
+
+
+class ArticleCreate(ArticleBase):
+    pass
+
+
+class ArticleUpdate(ArticleBase):
+    pass
+
+
+class ArticlePublic(ArticleBase):
+    id: str
+    textbook_id: str

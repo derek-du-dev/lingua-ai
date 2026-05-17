@@ -3,16 +3,28 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
-from auth import require_admin
+from auth import require_teacher_or_admin
 from database import get_db
-from models import Textbook, User
-from schemas import TextbookCreate, TextbookPublic, TextbookUpdate
+from models import Article, Textbook, User
+from schemas import ArticleCreate, ArticlePublic, TextbookCreate, TextbookPublic, TextbookUpdate
 
 router = APIRouter(prefix="/textbooks", tags=["textbooks"])
 
 
 def to_textbook_public(textbook: Textbook) -> TextbookPublic:
     return TextbookPublic(id=textbook.id, name=textbook.name)
+
+
+def to_article_public(article: Article) -> ArticlePublic:
+    return ArticlePublic(
+        id=article.id,
+        textbook_id=article.textbook_id,
+        title=article.title,
+        content=article.content,
+        keywords=article.keywords or [],
+        audio_url=article.audio_url,
+        sentences=article.sentences or [],
+    )
 
 
 def get_textbook_or_404(textbook_id: str, db: Session) -> Textbook:
@@ -32,7 +44,7 @@ def ensure_textbook_name_available(name: str, db: Session, exclude_textbook_id: 
 @router.get("", response_model=list[TextbookPublic], status_code=status.HTTP_200_OK)
 def list_textbooks(
     db: Session = Depends(get_db),
-    _admin: User = Depends(require_admin),
+    _manager: User = Depends(require_teacher_or_admin),
 ) -> list[TextbookPublic]:
     textbooks = db.query(Textbook).order_by(Textbook.name.asc()).all()
     return [to_textbook_public(textbook) for textbook in textbooks]
@@ -42,7 +54,7 @@ def list_textbooks(
 def create_textbook(
     payload: TextbookCreate,
     db: Session = Depends(get_db),
-    _admin: User = Depends(require_admin),
+    _manager: User = Depends(require_teacher_or_admin),
 ) -> TextbookPublic:
     ensure_textbook_name_available(payload.name, db)
 
@@ -58,7 +70,7 @@ def update_textbook(
     textbook_id: str,
     payload: TextbookUpdate,
     db: Session = Depends(get_db),
-    _admin: User = Depends(require_admin),
+    _manager: User = Depends(require_teacher_or_admin),
 ) -> TextbookPublic:
     textbook = get_textbook_or_404(textbook_id, db)
     ensure_textbook_name_available(payload.name, db, exclude_textbook_id=textbook.id)
@@ -73,9 +85,43 @@ def update_textbook(
 def delete_textbook(
     textbook_id: str,
     db: Session = Depends(get_db),
-    _admin: User = Depends(require_admin),
+    _manager: User = Depends(require_teacher_or_admin),
 ) -> Response:
     textbook = get_textbook_or_404(textbook_id, db)
     db.delete(textbook)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/{textbook_id}/articles", response_model=list[ArticlePublic], status_code=status.HTTP_200_OK)
+def list_textbook_articles(
+    textbook_id: str,
+    db: Session = Depends(get_db),
+    _manager: User = Depends(require_teacher_or_admin),
+) -> list[ArticlePublic]:
+    get_textbook_or_404(textbook_id, db)
+    articles = db.query(Article).filter(Article.textbook_id == textbook_id).order_by(Article.title.asc()).all()
+    return [to_article_public(article) for article in articles]
+
+
+@router.post("/{textbook_id}/articles", response_model=ArticlePublic, status_code=status.HTTP_201_CREATED)
+def create_textbook_article(
+    textbook_id: str,
+    payload: ArticleCreate,
+    db: Session = Depends(get_db),
+    _manager: User = Depends(require_teacher_or_admin),
+) -> ArticlePublic:
+    get_textbook_or_404(textbook_id, db)
+
+    article = Article(
+        textbook_id=textbook_id,
+        title=payload.title,
+        content=payload.content,
+        keywords=payload.keywords,
+        audio_url=payload.audio_url,
+        sentences=[sentence.model_dump() for sentence in payload.sentences],
+    )
+    db.add(article)
+    db.commit()
+    db.refresh(article)
+    return to_article_public(article)
