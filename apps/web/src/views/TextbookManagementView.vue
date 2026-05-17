@@ -19,9 +19,6 @@ import { notify } from '../services/notify'
 type ArticlePayload = {
   title: string
   content: string
-  keywords: string[]
-  audio_url: string
-  sentences: Array<{ content: string; audio_url: string }>
 }
 
 const textbooks = ref<TextbookPublic[]>([])

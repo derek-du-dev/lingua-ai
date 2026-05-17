@@ -103,9 +103,6 @@ class ArticleSentence(BaseModel):
 class ArticleBase(BaseModel):
     title: str = Field(min_length=1, max_length=255)
     content: str = ""
-    keywords: list[str] = Field(default_factory=list)
-    audio_url: str = Field(default="", max_length=512)
-    sentences: list[ArticleSentence] = Field(default_factory=list)
 
     @field_validator("title")
     @classmethod
@@ -120,16 +117,6 @@ class ArticleBase(BaseModel):
     def normalize_content(cls, value: str) -> str:
         return value.strip()
 
-    @field_validator("keywords")
-    @classmethod
-    def normalize_keywords(cls, value: list[str]) -> list[str]:
-        return [keyword.strip() for keyword in value if keyword.strip()]
-
-    @field_validator("audio_url")
-    @classmethod
-    def normalize_audio_url(cls, value: str) -> str:
-        return value.strip()
-
 
 class ArticleCreate(ArticleBase):
     pass
@@ -142,3 +129,5 @@ class ArticleUpdate(ArticleBase):
 class ArticlePublic(ArticleBase):
     id: str
     textbook_id: str
+    audio_url: str = Field(default="", max_length=512)
+    sentences: list[ArticleSentence] = Field(default_factory=list)

@@ -13,35 +13,16 @@ const emit = defineEmits<{
   save: [payload: {
     title: string
     content: string
-    keywords: string[]
-    audio_url: string
-    sentences: Array<{ content: string; audio_url: string }>
   }]
 }>()
 
 const form = reactive({
   title: '',
   content: '',
-  keywordsText: '',
-  audio_url: '',
-  sentencesText: '[]',
 })
 
-const jsonError = computed(() => {
-  try {
-    const parsed = JSON.parse(form.sentencesText || '[]')
-    if (!Array.isArray(parsed)) {
-      return '句子列表必须是 JSON 数组。'
-    }
-
-    const invalidItem = parsed.some((item) => !item || typeof item.content !== 'string' || typeof item.audio_url !== 'string')
-    return invalidItem ? '每个句子元素都需要 content 和 audio_url 字段。' : ''
-  } catch {
-    return '句子列表不是有效的 JSON。'
-  }
-})
 const isEdit = computed(() => Boolean(props.article))
-const canSubmit = computed(() => !props.saving && form.title.trim().length > 0 && !jsonError.value)
+const canSubmit = computed(() => !props.saving && form.title.trim().length > 0)
 
 watch(
   () => [props.open, props.article] as const,
@@ -52,19 +33,9 @@ watch(
 
     form.title = props.article?.title ?? ''
     form.content = props.article?.content ?? ''
-    form.keywordsText = props.article?.keywords?.join('，') ?? ''
-    form.audio_url = props.article?.audio_url ?? ''
-    form.sentencesText = JSON.stringify(props.article?.sentences ?? [], null, 2)
   },
   { immediate: true },
 )
-
-function parseKeywords() {
-  return form.keywordsText
-    .split(/[\n,，]/)
-    .map((keyword) => keyword.trim())
-    .filter(Boolean)
-}
 
 function handleSubmit() {
   if (!canSubmit.value) {
@@ -74,9 +45,6 @@ function handleSubmit() {
   emit('save', {
     title: form.title.trim(),
     content: form.content.trim(),
-    keywords: parseKeywords(),
-    audio_url: form.audio_url.trim(),
-    sentences: JSON.parse(form.sentencesText || '[]'),
   })
 }
 </script>
@@ -92,8 +60,8 @@ function handleSubmit() {
         <button class="text-2xl font-black text-slate-300 transition hover:text-slate-600" type="button" @click="emit('close')">×</button>
       </div>
 
-      <div class="mt-6 grid gap-5 lg:grid-cols-2">
-        <label class="block lg:col-span-2">
+      <div class="mt-6 grid gap-5">
+        <label class="block">
           <span class="mb-2 block text-sm font-bold text-slate-700">文章标题</span>
           <input
             v-model="form.title"
@@ -104,25 +72,6 @@ function handleSubmit() {
         </label>
 
         <label class="block">
-          <span class="mb-2 block text-sm font-bold text-slate-700">关键词列表</span>
-          <textarea
-            v-model="form.keywordsText"
-            class="min-h-28 w-full resize-y rounded-2xl border-2 border-amber-100 bg-amber-50/70 px-4 py-3 font-semibold outline-none transition focus:border-amber-400 focus:bg-white focus:ring-4 focus:ring-amber-100"
-            placeholder="可用逗号或换行分隔"
-          />
-        </label>
-
-        <label class="block">
-          <span class="mb-2 block text-sm font-bold text-slate-700">音频 URL</span>
-          <input
-            v-model="form.audio_url"
-            class="w-full rounded-2xl border-2 border-pink-100 bg-pink-50/70 px-4 py-3 font-semibold outline-none transition focus:border-pink-400 focus:bg-white focus:ring-4 focus:ring-pink-100"
-            placeholder="例如 audio/unit1/article1.mp3"
-            type="text"
-          >
-        </label>
-
-        <label class="block lg:col-span-2">
           <span class="mb-2 block text-sm font-bold text-slate-700">文章内容</span>
           <textarea
             v-model="form.content"
@@ -131,15 +80,6 @@ function handleSubmit() {
           />
         </label>
 
-        <label class="block lg:col-span-2">
-          <span class="mb-2 block text-sm font-bold text-slate-700">句子列表 JSON</span>
-          <textarea
-            v-model="form.sentencesText"
-            class="min-h-40 w-full resize-y rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 font-mono text-sm outline-none transition focus:border-slate-400 focus:bg-white focus:ring-4 focus:ring-slate-100"
-            placeholder='[{"content":"Hello.","audio_url":"audio/s1.mp3"}]'
-          />
-          <span v-if="jsonError" class="mt-2 block text-sm font-bold text-rose-600">{{ jsonError }}</span>
-        </label>
       </div>
 
       <div class="mt-7 flex justify-end gap-3">

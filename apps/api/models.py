@@ -52,7 +52,6 @@ class Article(Base):
     textbook_id = Column(String(36), ForeignKey("textbooks.id", ondelete="CASCADE"), index=True, nullable=False)
     title = Column(String(255), index=True, nullable=False)
     content = Column(Text, nullable=False, default="")
-    keywords = Column(JSON, nullable=False, default=list)
     audio_url = Column(String(512), nullable=False, default="")
     sentences = Column(JSON, nullable=False, default=list)
 

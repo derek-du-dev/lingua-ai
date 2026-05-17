@@ -3,9 +3,10 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
+from article_processing import build_article_assets
 from auth import require_teacher_or_admin
 from database import get_db
-from models import Article, Textbook, User
+from models import Article, Textbook, User, new_uuid7
 from schemas import ArticleCreate, ArticlePublic, TextbookCreate, TextbookPublic, TextbookUpdate
 
 router = APIRouter(prefix="/textbooks", tags=["textbooks"])
@@ -21,7 +22,6 @@ def to_article_public(article: Article) -> ArticlePublic:
         textbook_id=article.textbook_id,
         title=article.title,
         content=article.content,
-        keywords=article.keywords or [],
         audio_url=article.audio_url,
         sentences=article.sentences or [],
     )
@@ -112,14 +112,16 @@ def create_textbook_article(
     _manager: User = Depends(require_teacher_or_admin),
 ) -> ArticlePublic:
     get_textbook_or_404(textbook_id, db)
+    article_id = new_uuid7()
+    content, audio_url, sentences = build_article_assets(article_id, payload.content)
 
     article = Article(
+        id=article_id,
         textbook_id=textbook_id,
         title=payload.title,
-        content=payload.content,
-        keywords=payload.keywords,
-        audio_url=payload.audio_url,
-        sentences=[sentence.model_dump() for sentence in payload.sentences],
+        content=content,
+        audio_url=audio_url,
+        sentences=sentences,
     )
     db.add(article)
     db.commit()

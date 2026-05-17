@@ -2,10 +2,12 @@ from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 
 from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 import uvicorn
 
 from auth import create_access_token, get_current_user, verify_password
+from article_processing import MEDIA_DIR
 from database import get_db
 from init_db import init_database
 from models import User, UserType
@@ -16,10 +18,13 @@ from schemas import LoginRequest, LoginResponse, UserPublic
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     init_database()
+    MEDIA_DIR.mkdir(parents=True, exist_ok=True)
     yield
 
 
 app = FastAPI(title="Lingua API", lifespan=lifespan)
+MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 app.include_router(articles.router)
 app.include_router(users.router)
 app.include_router(textbooks.router)

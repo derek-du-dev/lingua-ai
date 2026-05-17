@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
+from article_processing import build_article_assets
 from auth import require_teacher_or_admin
 from database import get_db
 from models import Article, User
@@ -15,7 +16,6 @@ def to_article_public(article: Article) -> ArticlePublic:
         textbook_id=article.textbook_id,
         title=article.title,
         content=article.content,
-        keywords=article.keywords or [],
         audio_url=article.audio_url,
         sentences=article.sentences or [],
     )
@@ -36,11 +36,11 @@ def update_article(
     _manager: User = Depends(require_teacher_or_admin),
 ) -> ArticlePublic:
     article = get_article_or_404(article_id, db)
+    content, audio_url, sentences = build_article_assets(article.id, payload.content)
     article.title = payload.title
-    article.content = payload.content
-    article.keywords = payload.keywords
-    article.audio_url = payload.audio_url
-    article.sentences = [sentence.model_dump() for sentence in payload.sentences]
+    article.content = content
+    article.audio_url = audio_url
+    article.sentences = sentences
     db.commit()
     db.refresh(article)
     return to_article_public(article)
