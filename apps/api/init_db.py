@@ -6,19 +6,20 @@ from models import Base, User, UserType
 from system_settings import get_system_settings
 
 
-def drop_article_keywords_column() -> None:
+def migrate_articles_table() -> None:
     with engine.begin() as connection:
         columns = connection.execute(text("PRAGMA table_info(articles)")).mappings().all()
-        if not any(column["name"] == "keywords" for column in columns):
-            return
-
-        connection.execute(text("ALTER TABLE articles DROP COLUMN keywords"))
+        column_names = {column["name"] for column in columns}
+        if "keywords" in column_names:
+            connection.execute(text("ALTER TABLE articles DROP COLUMN keywords"))
+        if "key_points" not in column_names:
+            connection.execute(text("ALTER TABLE articles ADD COLUMN key_points JSON NOT NULL DEFAULT '[]'"))
 
 
 def init_database() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     Base.metadata.create_all(bind=engine)
-    drop_article_keywords_column()
+    migrate_articles_table()
 
     with SessionLocal() as db:
         admin = db.query(User).filter(User.username == "admin").first()

@@ -6,8 +6,9 @@ from sqlalchemy.orm import Session
 from article_processing import build_article_assets
 from auth import require_teacher_or_admin
 from database import get_db
-from models import Article, Textbook, User, new_uuid7
-from schemas import ArticleCreate, ArticlePublic, TextbookCreate, TextbookPublic, TextbookUpdate
+from models import Article, ArticleQuestion, Textbook, User, new_uuid7
+from question_generation import generate_article_questions, replace_article_questions
+from schemas import ArticleCreate, ArticlePublic, ArticleQuestionPublic, TextbookCreate, TextbookPublic, TextbookUpdate
 
 router = APIRouter(prefix="/textbooks", tags=["textbooks"])
 
@@ -16,7 +17,22 @@ def to_textbook_public(textbook: Textbook) -> TextbookPublic:
     return TextbookPublic(id=textbook.id, name=textbook.name)
 
 
+def to_article_question_public(question: ArticleQuestion) -> ArticleQuestionPublic:
+    return ArticleQuestionPublic(
+        id=question.id,
+        article_id=question.article_id,
+        question=question.question,
+        options=question.options or {},
+        correct_answer=question.correct_answer,
+        explanation=question.explanation,
+        difficulty=question.difficulty,
+        question_type=question.question_type,
+        order_index=question.order_index,
+    )
+
+
 def to_article_public(article: Article) -> ArticlePublic:
+    questions = sorted(article.questions, key=lambda question: question.order_index)
     return ArticlePublic(
         id=article.id,
         textbook_id=article.textbook_id,
@@ -24,6 +40,8 @@ def to_article_public(article: Article) -> ArticlePublic:
         content=article.content,
         audio_url=article.audio_url,
         sentences=article.sentences or [],
+        key_points=article.key_points or [],
+        questions=[to_article_question_public(question) for question in questions],
     )
 
 
@@ -122,8 +140,16 @@ def create_textbook_article(
         content=content,
         audio_url=audio_url,
         sentences=sentences,
+        key_points=[],
     )
     db.add(article)
     db.commit()
     db.refresh(article)
+
+    generated_questions = generate_article_questions(article.title, article.content)
+    if generated_questions:
+        replace_article_questions(db, article_id=article.id, questions=generated_questions)
+        db.commit()
+        db.refresh(article)
+
     return to_article_public(article)

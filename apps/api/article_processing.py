@@ -30,17 +30,22 @@ def get_nlp():
 
 
 def normalize_article_content(content: str) -> str:
-    compact_content = re.sub(r"\s+", " ", content).strip()
-    if not compact_content:
+    paragraphs = [re.sub(r"[ \t]+", " ", line).strip() for line in content.splitlines()]
+    paragraphs = [paragraph for paragraph in paragraphs if paragraph]
+    if not paragraphs:
         return ""
 
-    doc = get_nlp()(compact_content)
-    normalized = " ".join(token.text for token in doc if not token.is_space)
-    normalized = re.sub(r"\s+([,.;:!?%。，！？；：）\]\}])", r"\1", normalized)
-    normalized = re.sub(r"([\(\[\{（])\s+", r"\1", normalized)
-    normalized = re.sub(r"([,;:，；：])(?:\s*\1)+", r"\1", normalized)
-    normalized = re.sub(r"([.!?。！？])(?:\s*[.!?。！？])+", r"\1", normalized)
-    return re.sub(r"\s+", " ", normalized).strip()
+    normalized_paragraphs = []
+    for paragraph in paragraphs:
+        doc = get_nlp()(paragraph)
+        normalized = " ".join(token.text for token in doc if not token.is_space)
+        normalized = re.sub(r"\s+([,.;:!?%。，！？；：）\]\}])", r"\1", normalized)
+        normalized = re.sub(r"([\(\[\{（])\s+", r"\1", normalized)
+        normalized = re.sub(r"([,;:，；：])(?:\s*\1)+", r"\1", normalized)
+        normalized = re.sub(r"([.!?。！？])(?:\s*[.!?。！？])+", r"\1", normalized)
+        normalized_paragraphs.append(re.sub(r"[ \t]+", " ", normalized).strip())
+
+    return "\n".join(normalized_paragraphs)
 
 
 def split_sentences(content: str) -> list[str]:

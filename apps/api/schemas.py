@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -99,6 +100,44 @@ class TextbookPublic(BaseModel):
     name: str
 
 
+class ArticleKeyPointRange(BaseModel):
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+
+    @field_validator("end")
+    @classmethod
+    def validate_end(cls, value: int, info) -> int:
+        start = info.data.get("start")
+        if isinstance(start, int) and value <= start:
+            raise ValueError("结束位置必须大于开始位置")
+        return value
+
+
+class ArticleKeyPoint(BaseModel):
+    id: str = Field(min_length=1, max_length=64)
+    type: Literal["phrase", "selection"]
+    text: str = Field(min_length=1, max_length=255)
+    abbreviation: str = Field(default="", max_length=64)
+    ranges: list[ArticleKeyPointRange] = Field(default_factory=list)
+
+    @field_validator("text")
+    @classmethod
+    def normalize_text(cls, value: str) -> str:
+        text = value.strip()
+        if not text:
+            raise ValueError("重点词不能为空")
+        return text
+
+    @field_validator("abbreviation")
+    @classmethod
+    def normalize_abbreviation(cls, value: str) -> str:
+        return value.strip()
+
+
+class ArticleKeyPointsUpdate(BaseModel):
+    key_points: list[ArticleKeyPoint] = Field(default_factory=list)
+
+
 class ArticleSentence(BaseModel):
     content: str = Field(min_length=1)
     audio_url: str = ""
@@ -143,8 +182,33 @@ class ArticleUpdate(ArticleBase):
     pass
 
 
+class ArticleQuestionPublic(BaseModel):
+    id: str
+    article_id: str
+    question: str = Field(min_length=1)
+    options: dict[Literal["A", "B", "C", "D"], str]
+    correct_answer: Literal["A", "B", "C", "D"]
+    explanation: Optional[str] = None
+    difficulty: Optional[str] = None
+    question_type: str = "multiple_choice"
+    order_index: int
+
+    @field_validator("options")
+    @classmethod
+    def validate_options(cls, value: dict[str, str]) -> dict[str, str]:
+        expected_keys = {"A", "B", "C", "D"}
+        if set(value) != expected_keys:
+            raise ValueError("选项必须包含 A、B、C、D")
+        normalized = {key: option.strip() for key, option in value.items()}
+        if any(not option for option in normalized.values()):
+            raise ValueError("选项不能为空")
+        return normalized
+
+
 class ArticlePublic(ArticleBase):
     id: str
     textbook_id: str
     audio_url: str = Field(default="", max_length=512)
     sentences: list[ArticleSentence] = Field(default_factory=list)
+    key_points: list[ArticleKeyPoint] = Field(default_factory=list)
+    questions: list[ArticleQuestionPublic] = Field(default_factory=list)

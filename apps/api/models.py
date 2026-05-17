@@ -54,5 +54,24 @@ class Article(Base):
     content = Column(Text, nullable=False, default="")
     audio_url = Column(String(512), nullable=False, default="")
     sentences = Column(JSON, nullable=False, default=list)
+    key_points = Column(JSON, nullable=False, default=list)
 
     textbook = relationship("Textbook", back_populates="articles")
+    questions = relationship("ArticleQuestion", back_populates="article", cascade="all, delete-orphan")
+
+
+class ArticleQuestion(Base):
+    __tablename__ = "article_questions"
+
+    id = Column(String(36), primary_key=True, default=new_uuid7)
+    article_id = Column(String(36), ForeignKey("articles.id", ondelete="CASCADE"), index=True, nullable=False)
+    question = Column(Text, nullable=False)
+    options = Column(JSON, nullable=False)
+    correct_answer = Column(String(1), nullable=False)
+    explanation = Column(Text, nullable=True)
+    difficulty = Column(String(32), nullable=True)
+    question_type = Column(String(32), nullable=False, default="multiple_choice")
+    order_index = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    article = relationship("Article", back_populates="questions")

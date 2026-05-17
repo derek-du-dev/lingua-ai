@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import ArticleFormModal from '../components/ArticleFormModal.vue'
+import ArticleKeyPointsDrawer from '../components/ArticleKeyPointsDrawer.vue'
 import TextbookFormModal from '../components/TextbookFormModal.vue'
 import {
   createTextbookArticleTextbooksTextbookIdArticlesPost,
@@ -9,10 +10,12 @@ import {
   deleteTextbookTextbooksTextbookIdDelete,
   listTextbookArticlesTextbooksTextbookIdArticlesGet,
   listTextbooksTextbooksGet,
+  regenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePost,
   updateArticleArticlesArticleIdPut,
+  updateArticleKeyPointsArticlesArticleIdKeyPointsPut,
   updateTextbookTextbooksTextbookIdPut,
 } from '../api/client/sdk.gen'
-import type { ArticlePublic, TextbookPublic } from '../api/client/types.gen'
+import type { ArticleKeyPoint, ArticlePublic, TextbookPublic } from '../api/client/types.gen'
 import { getApiErrorMessage } from '../services/api'
 import { notify } from '../services/notify'
 
@@ -28,10 +31,14 @@ const loading = ref(false)
 const articlesLoading = ref(false)
 const saving = ref(false)
 const articleSaving = ref(false)
+const keyPointsSaving = ref(false)
+const regeneratingArticleId = ref('')
 const modalOpen = ref(false)
 const articleModalOpen = ref(false)
+const keyPointsDrawerOpen = ref(false)
 const editingTextbook = ref<TextbookPublic | null>(null)
 const editingArticle = ref<ArticlePublic | null>(null)
+const keyPointsArticle = ref<ArticlePublic | null>(null)
 
 const selectedTextbook = computed(() => textbooks.value.find((textbook) => textbook.id === selectedTextbookId.value) ?? null)
 
@@ -105,6 +112,40 @@ function openEditArticleModal(article: ArticlePublic) {
   articleModalOpen.value = true
 }
 
+function openKeyPointsDrawer(article: ArticlePublic) {
+  keyPointsArticle.value = article
+  keyPointsDrawerOpen.value = true
+}
+
+function updateArticleInList(article: ArticlePublic) {
+  const index = articles.value.findIndex((item) => item.id === article.id)
+  if (index >= 0) {
+    articles.value[index] = article
+  }
+}
+
+async function saveArticleKeyPoints(keyPoints: ArticleKeyPoint[]) {
+  if (!keyPointsArticle.value) {
+    return
+  }
+
+  keyPointsSaving.value = true
+  const result = await updateArticleKeyPointsArticlesArticleIdKeyPointsPut({
+    path: { article_id: keyPointsArticle.value.id },
+    body: { key_points: keyPoints },
+  })
+  keyPointsSaving.value = false
+
+  if (result.data) {
+    updateArticleInList(result.data)
+    keyPointsArticle.value = result.data
+    notify.success('重点词已保存。')
+    return
+  }
+
+  notify.error(getApiErrorMessage(result.error, '保存重点词失败。'))
+}
+
 async function saveTextbook(payload: { name: string }) {
   saving.value = true
   const result = editingTextbook.value
@@ -151,6 +192,22 @@ async function saveArticle(payload: ArticlePayload) {
   }
 
   notify.error(getApiErrorMessage(result.error, '保存文章失败。'))
+}
+
+async function regenerateArticleQuestions(article: ArticlePublic) {
+  regeneratingArticleId.value = article.id
+  const result = await regenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePost({
+    path: { article_id: article.id },
+  })
+  regeneratingArticleId.value = ''
+
+  if (result.data) {
+    updateArticleInList({ ...article, questions: result.data })
+    notify.success(`已生成 ${result.data.length} 道练习题。`)
+    return
+  }
+
+  notify.error(getApiErrorMessage(result.error, '生成练习题失败。'))
 }
 
 async function deleteTextbook(textbook: TextbookPublic) {
@@ -263,6 +320,7 @@ onMounted(loadTextbooks)
           <thead class="bg-slate-50 text-xs font-black uppercase tracking-wider text-slate-500">
             <tr>
               <th class="px-5 py-4">文章标题</th>
+              <th class="px-5 py-4">练习题</th>
               <th class="px-5 py-4 text-right">操作</th>
             </tr>
           </thead>
@@ -272,9 +330,19 @@ onMounted(loadTextbooks)
                 <span class="block truncate text-base font-black text-slate-800">{{ article.title }}</span>
               </td>
               <td class="px-5 py-4">
+                <span class="rounded-xl bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-700">{{ article.questions?.length ?? 0 }} 道</span>
+                <span v-if="article.questions?.[0]?.difficulty" class="ml-2 rounded-xl bg-amber-50 px-3 py-2 text-xs font-black text-amber-700">{{ article.questions[0].difficulty }}</span>
+              </td>
+              <td class="px-5 py-4">
                 <div class="flex justify-end gap-2">
                   <button class="rounded-xl bg-sky-50 px-3 py-2 font-black text-sky-700 transition hover:bg-sky-100" type="button" @click="openEditArticleModal(article)">
                     编辑
+                  </button>
+                  <button class="rounded-xl bg-emerald-50 px-3 py-2 font-black text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60" type="button" :disabled="regeneratingArticleId === article.id" @click="regenerateArticleQuestions(article)">
+                    {{ regeneratingArticleId === article.id ? '生成中...' : '生成练习题' }}
+                  </button>
+                  <button class="rounded-xl bg-violet-50 px-3 py-2 font-black text-violet-700 transition hover:bg-violet-100" type="button" @click="openKeyPointsDrawer(article)">
+                    重点词管理
                   </button>
                   <button class="rounded-xl bg-rose-50 px-3 py-2 font-black text-rose-700 transition hover:bg-rose-100" type="button" @click="deleteArticle(article)">
                     删除
@@ -283,7 +351,7 @@ onMounted(loadTextbooks)
               </td>
             </tr>
             <tr v-if="articles.length === 0">
-              <td class="px-5 py-16 text-center text-sm font-bold text-slate-400" colspan="2">该教材暂无文章。</td>
+              <td class="px-5 py-16 text-center text-sm font-bold text-slate-400" colspan="3">该教材暂无文章。</td>
             </tr>
           </tbody>
         </table>
@@ -293,4 +361,11 @@ onMounted(loadTextbooks)
 
   <TextbookFormModal :open="modalOpen" :saving="saving" :textbook="editingTextbook" @close="modalOpen = false" @save="saveTextbook" />
   <ArticleFormModal :article="editingArticle" :open="articleModalOpen" :saving="articleSaving" @close="articleModalOpen = false" @save="saveArticle" />
+  <ArticleKeyPointsDrawer
+    :article="keyPointsArticle"
+    :open="keyPointsDrawerOpen"
+    :saving="keyPointsSaving"
+    @close="keyPointsDrawerOpen = false"
+    @save="saveArticleKeyPoints"
+  />
 </template>

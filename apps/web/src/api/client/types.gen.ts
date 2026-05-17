@@ -19,6 +19,56 @@ export type ArticleCreate = {
 };
 
 /**
+ * ArticleKeyPoint
+ */
+export type ArticleKeyPoint = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Type
+     */
+    type: 'phrase' | 'selection';
+    /**
+     * Text
+     */
+    text: string;
+    /**
+     * Abbreviation
+     */
+    abbreviation?: string;
+    /**
+     * Ranges
+     */
+    ranges?: Array<ArticleKeyPointRange>;
+};
+
+/**
+ * ArticleKeyPointRange
+ */
+export type ArticleKeyPointRange = {
+    /**
+     * Start
+     */
+    start: number;
+    /**
+     * End
+     */
+    end: number;
+};
+
+/**
+ * ArticleKeyPointsUpdate
+ */
+export type ArticleKeyPointsUpdate = {
+    /**
+     * Key Points
+     */
+    key_points?: Array<ArticleKeyPoint>;
+};
+
+/**
  * ArticlePublic
  */
 export type ArticlePublic = {
@@ -46,6 +96,58 @@ export type ArticlePublic = {
      * Sentences
      */
     sentences?: Array<ArticleSentence>;
+    /**
+     * Key Points
+     */
+    key_points?: Array<ArticleKeyPoint>;
+    /**
+     * Questions
+     */
+    questions?: Array<ArticleQuestionPublic>;
+};
+
+/**
+ * ArticleQuestionPublic
+ */
+export type ArticleQuestionPublic = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Article Id
+     */
+    article_id: string;
+    /**
+     * Question
+     */
+    question: string;
+    /**
+     * Options
+     */
+    options: {
+        [key: string]: string;
+    };
+    /**
+     * Correct Answer
+     */
+    correct_answer: 'A' | 'B' | 'C' | 'D';
+    /**
+     * Explanation
+     */
+    explanation?: string | null;
+    /**
+     * Difficulty
+     */
+    difficulty?: string | null;
+    /**
+     * Question Type
+     */
+    question_type?: string;
+    /**
+     * Order Index
+     */
+    order_index: number;
 };
 
 /**
@@ -332,6 +434,100 @@ export type UpdateArticleArticlesArticleIdPutResponses = {
 };
 
 export type UpdateArticleArticlesArticleIdPutResponse = UpdateArticleArticlesArticleIdPutResponses[keyof UpdateArticleArticlesArticleIdPutResponses];
+
+export type ListArticleQuestionsArticlesArticleIdQuestionsGetData = {
+    body?: never;
+    path: {
+        /**
+         * Article Id
+         */
+        article_id: string;
+    };
+    query?: never;
+    url: '/articles/{article_id}/questions';
+};
+
+export type ListArticleQuestionsArticlesArticleIdQuestionsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListArticleQuestionsArticlesArticleIdQuestionsGetError = ListArticleQuestionsArticlesArticleIdQuestionsGetErrors[keyof ListArticleQuestionsArticlesArticleIdQuestionsGetErrors];
+
+export type ListArticleQuestionsArticlesArticleIdQuestionsGetResponses = {
+    /**
+     * Response List Article Questions Articles  Article Id  Questions Get
+     *
+     * Successful Response
+     */
+    200: Array<ArticleQuestionPublic>;
+};
+
+export type ListArticleQuestionsArticlesArticleIdQuestionsGetResponse = ListArticleQuestionsArticlesArticleIdQuestionsGetResponses[keyof ListArticleQuestionsArticlesArticleIdQuestionsGetResponses];
+
+export type RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostData = {
+    body?: never;
+    path: {
+        /**
+         * Article Id
+         */
+        article_id: string;
+    };
+    query?: never;
+    url: '/articles/{article_id}/questions/regenerate';
+};
+
+export type RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostError = RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostErrors[keyof RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostErrors];
+
+export type RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostResponses = {
+    /**
+     * Response Regenerate Article Questions Articles  Article Id  Questions Regenerate Post
+     *
+     * Successful Response
+     */
+    200: Array<ArticleQuestionPublic>;
+};
+
+export type RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostResponse = RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostResponses[keyof RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostResponses];
+
+export type UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutData = {
+    body: ArticleKeyPointsUpdate;
+    path: {
+        /**
+         * Article Id
+         */
+        article_id: string;
+    };
+    query?: never;
+    url: '/articles/{article_id}/key-points';
+};
+
+export type UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutError = UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutErrors[keyof UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutErrors];
+
+export type UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutResponses = {
+    /**
+     * Successful Response
+     */
+    200: ArticlePublic;
+};
+
+export type UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutResponse = UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutResponses[keyof UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutResponses];
 
 export type ListUsersUsersGetData = {
     body?: never;

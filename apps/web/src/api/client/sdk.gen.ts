@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateTextbookArticleTextbooksTextbookIdArticlesPostData, CreateTextbookArticleTextbooksTextbookIdArticlesPostErrors, CreateTextbookArticleTextbooksTextbookIdArticlesPostResponses, CreateTextbookTextbooksPostData, CreateTextbookTextbooksPostErrors, CreateTextbookTextbooksPostResponses, CreateUserUsersPostData, CreateUserUsersPostErrors, CreateUserUsersPostResponses, DeleteArticleArticlesArticleIdDeleteData, DeleteArticleArticlesArticleIdDeleteErrors, DeleteArticleArticlesArticleIdDeleteResponses, DeleteTextbookTextbooksTextbookIdDeleteData, DeleteTextbookTextbooksTextbookIdDeleteErrors, DeleteTextbookTextbooksTextbookIdDeleteResponses, DeleteUserUsersUserIdDeleteData, DeleteUserUsersUserIdDeleteErrors, DeleteUserUsersUserIdDeleteResponses, HealthCheckHealthGetData, HealthCheckHealthGetResponses, ListTextbookArticlesTextbooksTextbookIdArticlesGetData, ListTextbookArticlesTextbooksTextbookIdArticlesGetErrors, ListTextbookArticlesTextbooksTextbookIdArticlesGetResponses, ListTextbooksTextbooksGetData, ListTextbooksTextbooksGetResponses, ListUsersUsersGetData, ListUsersUsersGetResponses, LoginAuthLoginPostData, LoginAuthLoginPostErrors, LoginAuthLoginPostResponses, ReadCurrentUserAuthMeGetData, ReadCurrentUserAuthMeGetResponses, ReadRootGetData, ReadRootGetResponses, ReadSystemSettingsSystemSettingsGetData, ReadSystemSettingsSystemSettingsGetResponses, ResetUserPasswordUsersUserIdResetPasswordPostData, ResetUserPasswordUsersUserIdResetPasswordPostErrors, ResetUserPasswordUsersUserIdResetPasswordPostResponses, SaveSystemSettingsSystemSettingsPutData, SaveSystemSettingsSystemSettingsPutErrors, SaveSystemSettingsSystemSettingsPutResponses, UpdateArticleArticlesArticleIdPutData, UpdateArticleArticlesArticleIdPutErrors, UpdateArticleArticlesArticleIdPutResponses, UpdateTextbookTextbooksTextbookIdPutData, UpdateTextbookTextbooksTextbookIdPutErrors, UpdateTextbookTextbooksTextbookIdPutResponses, UpdateUserUsersUserIdPutData, UpdateUserUsersUserIdPutErrors, UpdateUserUsersUserIdPutResponses } from './types.gen';
+import type { CreateTextbookArticleTextbooksTextbookIdArticlesPostData, CreateTextbookArticleTextbooksTextbookIdArticlesPostErrors, CreateTextbookArticleTextbooksTextbookIdArticlesPostResponses, CreateTextbookTextbooksPostData, CreateTextbookTextbooksPostErrors, CreateTextbookTextbooksPostResponses, CreateUserUsersPostData, CreateUserUsersPostErrors, CreateUserUsersPostResponses, DeleteArticleArticlesArticleIdDeleteData, DeleteArticleArticlesArticleIdDeleteErrors, DeleteArticleArticlesArticleIdDeleteResponses, DeleteTextbookTextbooksTextbookIdDeleteData, DeleteTextbookTextbooksTextbookIdDeleteErrors, DeleteTextbookTextbooksTextbookIdDeleteResponses, DeleteUserUsersUserIdDeleteData, DeleteUserUsersUserIdDeleteErrors, DeleteUserUsersUserIdDeleteResponses, HealthCheckHealthGetData, HealthCheckHealthGetResponses, ListArticleQuestionsArticlesArticleIdQuestionsGetData, ListArticleQuestionsArticlesArticleIdQuestionsGetErrors, ListArticleQuestionsArticlesArticleIdQuestionsGetResponses, ListTextbookArticlesTextbooksTextbookIdArticlesGetData, ListTextbookArticlesTextbooksTextbookIdArticlesGetErrors, ListTextbookArticlesTextbooksTextbookIdArticlesGetResponses, ListTextbooksTextbooksGetData, ListTextbooksTextbooksGetResponses, ListUsersUsersGetData, ListUsersUsersGetResponses, LoginAuthLoginPostData, LoginAuthLoginPostErrors, LoginAuthLoginPostResponses, ReadCurrentUserAuthMeGetData, ReadCurrentUserAuthMeGetResponses, ReadRootGetData, ReadRootGetResponses, ReadSystemSettingsSystemSettingsGetData, ReadSystemSettingsSystemSettingsGetResponses, RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostData, RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostErrors, RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostResponses, ResetUserPasswordUsersUserIdResetPasswordPostData, ResetUserPasswordUsersUserIdResetPasswordPostErrors, ResetUserPasswordUsersUserIdResetPasswordPostResponses, SaveSystemSettingsSystemSettingsPutData, SaveSystemSettingsSystemSettingsPutErrors, SaveSystemSettingsSystemSettingsPutResponses, UpdateArticleArticlesArticleIdPutData, UpdateArticleArticlesArticleIdPutErrors, UpdateArticleArticlesArticleIdPutResponses, UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutData, UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutErrors, UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutResponses, UpdateTextbookTextbooksTextbookIdPutData, UpdateTextbookTextbooksTextbookIdPutErrors, UpdateTextbookTextbooksTextbookIdPutResponses, UpdateUserUsersUserIdPutData, UpdateUserUsersUserIdPutErrors, UpdateUserUsersUserIdPutResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -33,6 +33,37 @@ export const deleteArticleArticlesArticleIdDelete = <ThrowOnError extends boolea
 export const updateArticleArticlesArticleIdPut = <ThrowOnError extends boolean = false>(options: Options<UpdateArticleArticlesArticleIdPutData, ThrowOnError>) => (options.client ?? client).put<UpdateArticleArticlesArticleIdPutResponses, UpdateArticleArticlesArticleIdPutErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/articles/{article_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List Article Questions
+ */
+export const listArticleQuestionsArticlesArticleIdQuestionsGet = <ThrowOnError extends boolean = false>(options: Options<ListArticleQuestionsArticlesArticleIdQuestionsGetData, ThrowOnError>) => (options.client ?? client).get<ListArticleQuestionsArticlesArticleIdQuestionsGetResponses, ListArticleQuestionsArticlesArticleIdQuestionsGetErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/articles/{article_id}/questions',
+    ...options
+});
+
+/**
+ * Regenerate Article Questions
+ */
+export const regenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePost = <ThrowOnError extends boolean = false>(options: Options<RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostData, ThrowOnError>) => (options.client ?? client).post<RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostResponses, RegenerateArticleQuestionsArticlesArticleIdQuestionsRegeneratePostErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/articles/{article_id}/questions/regenerate',
+    ...options
+});
+
+/**
+ * Update Article Key Points
+ */
+export const updateArticleKeyPointsArticlesArticleIdKeyPointsPut = <ThrowOnError extends boolean = false>(options: Options<UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutData, ThrowOnError>) => (options.client ?? client).put<UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutResponses, UpdateArticleKeyPointsArticlesArticleIdKeyPointsPutErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/articles/{article_id}/key-points',
     ...options,
     headers: {
         'Content-Type': 'application/json',
