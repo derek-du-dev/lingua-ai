@@ -13,7 +13,7 @@ import type {
 } from '../api/client/types.gen'
 import { getApiErrorMessage } from '../services/api'
 import { notify } from '../services/notify'
-import { buildHighlightRanges, buildTextSegments, highlightClass } from '../utils/articleHighlights'
+import { buildHighlightRanges, buildTextSegments, highlightClass, type TextSegment } from '../utils/articleHighlights'
 
 type AnswerChoice = 'A' | 'B' | 'C' | 'D'
 
@@ -25,10 +25,14 @@ const selectedAnswers = ref<Record<string, AnswerChoice>>({})
 const result = ref<LearningAnswerSubmissionResult | null>(null)
 const loading = ref(false)
 const submitting = ref(false)
+const hoveredKeyPointId = ref('')
+const tooltipPosition = ref({ x: 0, y: 0 })
+let tooltipHideTimer: ReturnType<typeof setTimeout> | null = null
 
 const questions = computed(() => article.value?.questions ?? [])
 const articleContent = computed(() => article.value?.content ?? '')
 const articleTextSegments = computed(() => buildTextSegments(articleContent.value, buildHighlightRanges(articleContent.value, article.value?.key_points ?? [])))
+const hoveredKeyPoint = computed(() => article.value?.key_points?.find((point) => point.id === hoveredKeyPointId.value && point.abbreviation) ?? null)
 const canSubmit = computed(() => questions.value.length > 0 && questions.value.every((question) => selectedAnswers.value[question.id]))
 const resultItemsByQuestionId = computed(() => {
   const items: Record<string, LearningAnswerResultItem> = {}
@@ -55,6 +59,39 @@ function selectAnswer(questionId: string, answer: AnswerChoice) {
   selectedAnswers.value[questionId] = answer
 }
 
+function clearTooltipTimer() {
+  if (tooltipHideTimer) {
+    clearTimeout(tooltipHideTimer)
+    tooltipHideTimer = null
+  }
+}
+
+function showTooltip(segment: TextSegment, event: MouseEvent) {
+  if (!segment.keyPointId) {
+    return
+  }
+
+  const point = article.value?.key_points?.find((item) => item.id === segment.keyPointId)
+  if (!point?.abbreviation) {
+    return
+  }
+
+  const target = event.currentTarget instanceof HTMLElement ? event.currentTarget : null
+  const rect = target?.getBoundingClientRect()
+  clearTooltipTimer()
+  hoveredKeyPointId.value = segment.keyPointId
+  tooltipPosition.value = rect
+    ? { x: rect.left, y: rect.bottom }
+    : { x: event.clientX, y: event.clientY }
+}
+
+function scheduleHideTooltip() {
+  clearTooltipTimer()
+  tooltipHideTimer = setTimeout(() => {
+    hoveredKeyPointId.value = ''
+  }, 180)
+}
+
 function openIntensiveListening() {
   if (!article.value?.id) {
     return
@@ -73,6 +110,7 @@ async function loadArticle() {
   article.value = null
   result.value = null
   selectedAnswers.value = {}
+  hoveredKeyPointId.value = ''
   const response = await readLearningArticleLearningArticlesArticleIdGet({ path: { article_id: articleId } })
   loading.value = false
 
@@ -144,7 +182,13 @@ watch(() => route.params.articleId, loadArticle, { immediate: true })
 
         <div class="mt-6 rounded-[1.5rem] border-2 border-slate-100 bg-white p-5 text-base font-semibold leading-8 text-slate-700 whitespace-pre-wrap">
           <template v-if="articleContent">
-            <span v-for="(segment, index) in articleTextSegments" :key="index" :class="segment.highlight ? `rounded px-1 py-0.5 ${highlightClass(segment.type)}` : ''">{{ segment.text }}</span>
+            <span
+              v-for="(segment, index) in articleTextSegments"
+              :key="index"
+              :class="segment.highlight ? `cursor-help rounded px-1 py-0.5 ${highlightClass(segment.type)}` : ''"
+              @mouseenter="segment.highlight && showTooltip(segment, $event)"
+              @mouseleave="segment.highlight && scheduleHideTooltip()"
+            >{{ segment.text }}</span>
           </template>
           <template v-else>暂无文章内容。</template>
         </div>
@@ -212,6 +256,17 @@ watch(() => route.params.articleId, loadArticle, { immediate: true })
           </button>
         </div>
       </section>
+      </div>
+
+      <div
+        v-if="hoveredKeyPoint"
+        class="fixed z-50 max-w-xs rounded-2xl border-2 border-white bg-slate-900 px-4 py-3 text-white shadow-2xl shadow-slate-500/40"
+        :style="{ left: `${tooltipPosition.x}px`, top: `${tooltipPosition.y + 8}px` }"
+        @mouseenter="clearTooltipTimer"
+        @mouseleave="scheduleHideTooltip"
+      >
+        <p class="text-xs font-black uppercase tracking-[0.2em] text-violet-200">注释</p>
+        <p class="mt-2 whitespace-pre-wrap text-sm font-semibold leading-6">{{ hoveredKeyPoint.abbreviation }}</p>
       </div>
     </template>
   </section>

@@ -54,11 +54,6 @@ cd apps/api
 uv sync
 ```
 
-一键启动脚本：
-
-```powershell
-./start.bat
-```
 
 启动开发服务：
 
